@@ -85,43 +85,22 @@ from bayes_opt import BayesianOptimization
 # Seed to be used for al models etc.
 SEED = 400
 
+df1 = pd.read_csv("moz_orig_df.csv")
 
-# Import data set
-train_df = pd.read_csv('data/training_set.csv')
-test_df = pd.read_csv('data/test_set.csv')
+df2 = pd.read_csv("moz_aug_df.csv")
 
-
-sample_submission = pd.read_csv('data/SampleSubmission.csv')
-test_ids = pd.read_csv('data/new_data.csv', usecols=['Square_ID'])
-
-precip_cols = [f'precip_wk-{i}' for i in range(17, 0, -1)]
+df3 = pd.read_csv("moz_diam_df.csv")
 
 
-### Prepare data
-
-# Features to be used in modellling
-train_feats = [
-        'LC_Type1_mode', 'target_2015',
-        'precip_wk-17', 'precip_wk-16', 'precip_wk-15',
-       'precip_wk-14', 'precip_wk-13', 'precip_wk-12', 'precip_wk-11',
-       'precip_wk-10', 'precip_wk-9', 'precip_wk-8', 'precip_wk-7',
-       'precip_wk-6', 'precip_wk-5', 'precip_wk-4', 'precip_wk-3',
-       'precip_wk-2', 'precip_wk-1', 'elevation', 'X', 'Y', 'inland_water',
-       'distance_to_road', 'distance_to_water', 'max_slope',
-       'soil_ssm', 'soil_susm', 'ndvi', 'evi', 'evap_mean'
-       ]
+train_df = pd.concat([df1, df2])
+train_df = pd.concat([train_df, df3])
 
 
-train_df = train_df[train_feats]
+train_df = train_df[train_df['target'] > 0.0]
 
+y = train_df['target']
+X = train_df.drop('target', axis=1)
 
-train_df = train_df[train_df['target_2015'] > 0.0]
-
-y = train_df['target_2015']
-X = train_df.drop('target_2015', axis=1)
-
-# Test data set
-test_df = test_df[X.columns]
 
 
 def preprocess_data(X, y):
@@ -143,11 +122,9 @@ def preprocess_data(X, y):
 X, y = preprocess_data(X, y)
 
 
-new_X = X[precip_cols]
 
-
-X = new_X[:50000]
-X_test = new_X[50000:]
+X_train = X[:8000]
+X_test = X[8000:]
 
 
 # X = data.iloc[:, :16]
@@ -160,8 +137,8 @@ scaler = MinMaxScaler()
 scaler.fit(X)
 X = scaler.transform(X)
 
-yy = y[:50000]
-y_test = y[50000:]
+y_train = y[:8000]
+y_test = y[8000:]
 
 # Example of one output for whole sequence
 from keras.models import Sequential
@@ -170,20 +147,19 @@ import numpy as np
 
 # define model where LSTM is also output layer
 model = Sequential()
-model.add(LSTM(1, return_sequences=True, input_shape=(17,1)))
-model.add(LSTM(1, dropout=0.9, recurrent_dropout=0.5))
+model.add(LSTM(1, return_sequences=True, input_shape=(30,1)))
+model.add(LSTM(1, dropout=0.1, recurrent_dropout=0.1))
 model.add(Dense(1))
 model.compile(optimizer='adam', loss='mse')
 
-xx = X.reshape((len(X), 17, 1))
+X_train = X_train.values.reshape((len(X_train), 30, 1))
 
-model.fit(xx, yy, epochs=5)
+model.fit(X_train, y_train, epochs=5)
 
-#x_test = X_test.iloc[:, :17]
-xx_test = X_test.values.reshape((len(X_test), 17, 1))
+X_test = X_test.values.reshape((len(X_test), 30, 1))
 
 
-preds = model.predict(xx_test).reshape(len(X_test,))
+preds = model.predict(X_test).reshape(len(X_test,))
 
 
 def rmse(predictions, targets):
@@ -193,49 +169,34 @@ rmse(preds, y_test)
 
 
 
-from sklearn.model_selection import train_test_split
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=SEED)
 
 
-yy = pd.qcut(y, 2, labels=False, duplicates='drop')
+##### Test model
+
+yy = pd.qcut(y, 10, labels=False, duplicates='drop')
 
 
+from sklearn.model_selection import StratifiedKFold
+skf = StratifiedKFold(n_splits=5)
+skf.get_n_splits(X, yy)
 
-from sklearn.mixture import GaussianMixture 
-
-
-y_label = [1 if i < 0.25 else 0 for i in y]
-
-#y = y.values.reshape(len(y),1)
-
-
-model = GaussianMixture(n_components=2, covariance_type='full', random_state=SEED)  # 2. Instantiate the model with hyperparameters
-model.fit(X)                    # 3. Fit to data. Notice y is not specified!
-y_gmm = model.predict(X)
-
-
-
-y_clust = pd.concat([pd.Series(y_label), pd.Series(y_gmm)], axis=1)
-y_clust = y_clust.rename(columns={0:'Label', 1:'GMM'})
-
-
-new_train_df = pd.read_csv('../data/training_set.csv')
-
-
-new_train_df['clust'] = y_gmm
-
-new_train_df[new_train_df.clust == 1]['target_2015'].hist(bins=100)
-
-new_X = new_train_df[['elevation', 'target_2015']]
-
-
-model = GaussianMixture(n_components=2, covariance_type='full', random_state=SEED)  # 2. Instantiate the model with hyperparameters
-model.fit(new_X)                    # 3. Fit to data. Notice y is not specified!
-y_gmm = model.predict(new_X)
+X = pd.DataFrame(X)
+#print(skf)
+count = 1
+for train_index, test_index in skf.split(X, yy):
+    print("TRAIN:", train_index, "TEST:", test_index)
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+    X_train = X_train.values.reshape((len(X_train), 30, 1))
+    model.fit(X_train, y_train, epochs=5)
+    X_test = X_test.values.reshape((len(X_test), 30, 1))
+    preds = model.predict(X_test).reshape(len(X_test,))
+    print(f"The RMSE on fold {count} is {rmse(preds, y_test)}")
 
 
 
+
+    
 
 
 
