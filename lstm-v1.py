@@ -84,7 +84,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 import lightgbm as lgb
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 
 
 # Example of one output for whole sequence
@@ -95,6 +95,7 @@ import numpy as np
 
 
 from sklearn.covariance import EllipticEnvelope
+from keras.utils import to_categorical
 
 
 # Seed to be used for al models etc.
@@ -113,17 +114,49 @@ train_df = pd.concat([df, df1])
 train_df = pd.concat([train_df, df2])
 train_df = pd.concat([train_df, df3])
 
+del df1, df2, df3
 
-# train_df = train_df[train_df['target'] > 0.0]
+# onehot_encoder = OneHotEncoder(sparse=False, handle_unknown="ignore")
+# #integer_encoded = integer_encoded.reshape(train_df["land_cover_t-1"], 1)
+# onehot_encoded = onehot_encoder.fit_transform(train_df[["land_cover_mode_t-1", "land_cover_mode_t-2"]])
+# print(onehot_encoded)
+# # invert first example
 
-#feat = [i for i in train_df.columns if "susm" not in i]
+feats = [i for i in train_df.columns if "land_cover" not in i]
 
-#train_df = train_df[feat]
+# onehot_encoder.get_feature_names(input_features=feats)
 
+
+# def cat_to_code(df, col):
+    
+#     # Define feature names
+#     feats = [i for i in df.columns if col in i]
+#     # Convert to integers
+#     for feat in feats:
+#         onehot_encoder = OneHotEncoder(sparse=False, handle_unknown="ignore")
+#         #print(feat)
+#         cat = df[feat].astype(int).values.reshape(len(df), 1)
+#         feat_idx = df.columns.get_loc(feat)
+#         vec = onehot_encoder.fit_transform(cat)
+#         coded_feats = onehot_encoder.get_feature_names(input_features=[feat])
+#         #df = pd.DataFrame(train_X_encoded, columns=coded_feats)
+        
+#         df = pd.concat([df.iloc[:, :feat_idx], 
+#                         pd.DataFrame(vec, columns=coded_feats, index=df.index), 
+#                         df.iloc[:, feat_idx:]], axis=1)
+        
+#     return df
+        
+# train_df = cat_to_code(train_df, col="land_cover")
+
+feat = [i for i in train_df[feats].columns if ("X" not in i and "Y" not in i)]
+
+
+train_df = train_df[feat]
 train_df = train_df.fillna(train_df.mean())
 
 
-clf2 = EllipticEnvelope(contamination=.20,random_state=SEED)
+clf2 = EllipticEnvelope(contamination=.20, random_state=SEED)
 clf2.fit(train_df)
 
 ee_scores = pd.Series(clf2.decision_function(train_df))
@@ -137,8 +170,12 @@ X, y = train_df.drop(columns=['pred','target']), train_df['target']
 # y = train_df['target']
 # X = train_df.drop('target', axis=1)
 
-feat = [i for i in X.columns if "susm" not in i]
-X = X[feat]
+#feat = [i for i in X.columns if "susm" not in i]
+
+#X = X[feat]
+
+
+
 
 
 # def preprocess_data(X, y):
@@ -182,9 +219,9 @@ callback = tf.keras.callbacks.EarlyStopping(monitor='val_root_mean_squared_error
 
 # define model where LSTM is also output layer
 model = tf.keras.Sequential()
-model.add(tf.keras.layers.LSTM(64, return_sequences=True, input_shape=(30,5)))
-model.add(tf.keras.layers.LSTM(32, dropout=0.1, recurrent_dropout=0.1))
-model.add(tf.keras.layers.Dense(1))
+model.add(tf.keras.layers.LSTM(64, return_sequences=True, input_shape=(30,4), kernel_constraint=tf.keras.constraints.NonNeg()))
+model.add(tf.keras.layers.LSTM(32, dropout=0.1, recurrent_dropout=0.1, kernel_constraint=tf.keras.constraints.NonNeg()))
+model.add(tf.keras.layers.Dense(1, kernel_constraint=tf.keras.constraints.NonNeg()))
 #model.compile(optimizer='adam', loss='mse', metrics=[tf.keras.metrics.RootMeanSquaredError()])
 model.compile(optimizer='adam', loss=tf.keras.losses.Huber(), metrics=[tf.keras.metrics.RootMeanSquaredError()])
 
@@ -232,8 +269,8 @@ for train_index, val_index in skf.split(X, yy):
     #y_log_train = np.log1p(y_train)
     X_train = scaler.fit_transform(X_train)
     X_val = scaler.fit_transform(X_val)
-    X_train = X_train.reshape((len(X_train), 30, 5))
-    X_val = X_val.reshape((len(X_val), 30, 5))
+    X_train = X_train.reshape((len(X_train), 30, 4))
+    X_val = X_val.reshape((len(X_val), 30, 4))
     model.fit(X_train, y_train, epochs=10, validation_data=(X_val, y_val),
                  callbacks=[callback])
     #model.fit(X_train, y_log_train, epochs=5)
@@ -258,10 +295,14 @@ print(f"The average RMSE is {np.mean(rmse_list)}")
 # The average RMSE is 0.12377201020717621 (with 64, 32)
 # The average RMSE is 0.12217734754085541 (huber + validation)
 # The average RMSE is 0.11980126798152924 (+ slope)
-# The average RMSE is 0.11943419277667999 (without outliers 20%)
+# The average RMSE is 0.10974271595478058 (without outliers 20%)
+# The average RMSE is 0.11043436825275421 (without land_cover)
+# The average RMSE is 0.10685320198535919 (with non-neg weight constraint)
 
 test_df = pd.read_csv('data/mwi_orig_df.csv')
 
+test_feat = [i for i in test_df.columns if ("X" not in i and "Y" not in i)]
+test_df = test_df[test_feat]
 y_test = test_df['target']
 X_test = test_df.drop('target', axis=1)
 
@@ -292,17 +333,20 @@ def plot_flood(res, rows, cols):
 def plot_flood_preds(res, rows, cols):
     
     flood_list = list(res)
-    mat = np.array(flood_list).reshape(rows, cols)
+    mat = np.array(flood_list).T.reshape(rows, cols)
     plt.imshow(mat) #, cmap='Blues')
     return plt.show()
 
-plot_flood(final_preds, rows=363, cols=142)
-
-
+plot_flood_preds(final_preds, rows=363, cols=142)
 
 plot_flood(y_test, rows=363, cols=142)
 
+res_df = pd.DataFrame(data={"true": y_test, "final_preds": final_preds}, dtype=float)
 
+
+"""
+Maybe try a binary classifier?????
+"""
 
 #=================================================================
 
