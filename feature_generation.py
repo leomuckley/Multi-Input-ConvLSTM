@@ -138,6 +138,15 @@ def inside_border(grid, country='Mozambique'):
     return grid[in_border]
 
 
+def return_coords(df_):
+    df = df_.copy()
+    def get_coords(row):
+        row['X'] = row['centroid'].x
+        row['Y'] = row['centroid'].y     
+        return row
+    return df.apply(get_coords, axis=1)
+
+
 
 
 # df = moz_orig_df.copy()
@@ -224,10 +233,19 @@ slope = GeeImages(data_filepath, slope_file_list)
 moz_orig_df = slope.add_all_images(moz_orig_df)
 
 
+
+# add coordinates from centroids
+moz_orig_df = return_coords(moz_orig_df)
+
+
+
 # Duplicate constant features into temporal features
 moz_orig_df = copy_col(moz_orig_df, column='elevation', rep=30)
 moz_orig_df = copy_col(moz_orig_df, column='slope', rep=30)
 moz_orig_df = copy_col(moz_orig_df, column='land_cover_mode', rep=30)
+moz_orig_df = copy_col(moz_orig_df, column='X', rep=30)
+moz_orig_df = copy_col(moz_orig_df, column='Y', rep=30)
+
 
 
 # Duplicate temporal features
@@ -287,9 +305,16 @@ ssm = GeeImages(soil_filepath, ssm_file_list)
 moz_aug_df1 = ssm.add_all_images(moz_aug_df1)
 
 
+
+# add coordinates from centroids
+moz_aug_df1 = return_coords(moz_aug_df1)
+
 # Duplicate constant features into temporal features
 moz_aug_df1 = copy_col(moz_aug_df1, column='elevation', rep=30)
+moz_aug_df1 = copy_col(moz_aug_df1, column='slope', rep=30)
 moz_aug_df1 = copy_col(moz_aug_df1, column='land_cover_mode', rep=30)
+moz_aug_df1 = copy_col(moz_aug_df1, column='X', rep=30)
+moz_aug_df1 = copy_col(moz_aug_df1, column='Y', rep=30)
 
 
 # Duplicate temporal features
@@ -364,9 +389,15 @@ moz_aug_df2 = ssm.add_all_images(moz_aug_df2)
 
 
 
+# add coordinates from centroids
+moz_aug_df2 = return_coords(moz_aug_df2)
+
 # Duplicate constant features into temporal features
 moz_aug_df2 = copy_col(moz_aug_df2, column='elevation', rep=30)
+moz_aug_df2 = copy_col(moz_aug_df2, column='slope', rep=30)
 moz_aug_df2 = copy_col(moz_aug_df2, column='land_cover_mode', rep=30)
+moz_aug_df2 = copy_col(moz_aug_df2, column='X', rep=30)
+moz_aug_df2 = copy_col(moz_aug_df2, column='Y', rep=30)
 
 
 
@@ -444,9 +475,15 @@ ssm = GeeImages(soil_filepath, ssm_file_list)
 moz_aug_df3 = ssm.add_all_images(moz_aug_df3)
 
 
+# add coordinates from centroids
+moz_aug_df3 = return_coords(moz_aug_df3)
+
 # Duplicate constant features into temporal features
 moz_aug_df3 = copy_col(moz_aug_df3, column='elevation', rep=30)
+moz_aug_df3 = copy_col(moz_aug_df3, column='slope', rep=30)
 moz_aug_df3 = copy_col(moz_aug_df3, column='land_cover_mode', rep=30)
+moz_aug_df3 = copy_col(moz_aug_df3, column='X', rep=30)
+moz_aug_df3 = copy_col(moz_aug_df3, column='Y', rep=30)
 
 
 # Duplicate temporal features
@@ -629,6 +666,14 @@ mwi_orig_df = slope.add_all_images(mwi_orig_df)
 mwi_orig_df = copy_col(mwi_orig_df, column='mwi_elevation', rep=30)
 mwi_orig_df = copy_col(mwi_orig_df, column='mwi_slope', rep=30)
 mwi_orig_df = copy_col(mwi_orig_df, column='mwi_land_cover_mode', rep=30)
+
+# add coordinates from centroids
+mwi_orig_df = return_coords(mwi_orig_df)
+
+# Duplicate constant features into temporal features
+
+mwi_orig_df = copy_col(mwi_orig_df, column='X', rep=30)
+mwi_orig_df = copy_col(mwi_orig_df, column='Y', rep=30)
 
 
 # Duplicate temporal features
