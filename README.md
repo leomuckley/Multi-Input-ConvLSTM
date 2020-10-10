@@ -1,4 +1,4 @@
-# Implementation of a Multi-Input ConvLSTM for the predicting flood extent.
+# Implementation of a Multi-Input ConvLSTM for the predicting flood extent
 
 
 ### Abstract:
