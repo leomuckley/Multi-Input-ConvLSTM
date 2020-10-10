@@ -18,17 +18,6 @@ from shapely.ops import nearest_points
 from gee_images import GeeImages
 
 
-"""
-var before_start= '2019-03-01';
-var before_end='2019-03-10';
-
-// Now set the same parameters for AFTER the flood.
-var after_start='2019-03-13';
-var after_end='2019-03-23';
-
-"""
-
-
 
 def make_grid(xmin, ymin, xmax, ymax):
     
@@ -177,22 +166,6 @@ def coords_to_geom(df_):
     geom = [Point(df.X[i], df.Y[i]) for i in range(len(df))]
     #df['geometry'] = geom
     return geom
-
-# df = moz_orig_df.copy()
-
-# df['X'] = gpd.GeoSeries(df.centroid).x
-
-# df['Y'] = gpd.GeoSeries(df.centroid).y
-
-# df['target'] = moz_orig_df.target
-
-# ax = pd.DataFrame(df).plot.hexbin(x='coord_x',
-#                     y='coord_y',
-#                     C='target',
-#                     #reduce_C_function=np.sum,
-#                     #gridsize=10,
-#                     cmap="Blues")
-
 
 ################      Original Mozambique GEE Image      ######################
 
@@ -707,30 +680,6 @@ def plot_test_flood(train):
     return plt.show()
 
 
-
-# df = moz_orig_df.copy()
-
-# df['X'] = gpd.GeoSeries(df.centroid).x
-
-# df['Y'] = gpd.GeoSeries(df.centroid).y
-
-# df['target'] = moz_orig_df.target
-
-# # ax = pd.DataFrame(df).plot.hexbin(x='coord_x',
-# #                     y='coord_y',
-# #                     C='target',
-# #                     #reduce_C_function=np.sum,
-# #                     #gridsize=10,
-# #                     cmap="Blues")
-
-# plot_test_flood(df)
-
-
-# test_df = df.iloc[:len(train), :]
-
-
-
-# test_df.iloc[:, 5]
 
 
 
