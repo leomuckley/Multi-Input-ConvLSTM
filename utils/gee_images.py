@@ -13,6 +13,7 @@ from urllib.parse import urljoin
 import pandas as pd
 
 class GeeImages():
+    """ Helper function for adding GEE images. """
     
     def __init__(self, filepath, filelist):
         self.filepath = filepath
