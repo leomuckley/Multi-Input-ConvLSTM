@@ -14,19 +14,6 @@ import matplotlib.pyplot as plt
 import geopandas as gpd
 from shapely.geometry import Point
 
-
-
-"""
-var before_start= '2019-03-01';
-var before_end='2019-03-10';
-
-// Now set the same parameters for AFTER the flood.
-var after_start='2019-03-13';
-var after_end='2019-03-23';
-
-"""
-
-
 moz_zipfile = "zip:///home/leo/Desktop/ml_flood_prediction/data/floods_13-03-2020/moz_flood.zip"
 moz_gdf = gpd.read_file(moz_zipfile)
 moz_geo = gpd.GeoDataFrame(moz_gdf)
