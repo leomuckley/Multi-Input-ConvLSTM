@@ -1,4 +1,5 @@
-# Implementation of a Multi-Input ConvLSTM for the predicting flood extent
+# Deep Learning for Flood Extent Prediction
+Implementation of a Multi-Input ConvLSTM for the predicting flood extent in Python
 
 
 ### Abstract:
