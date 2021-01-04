@@ -8,8 +8,7 @@ As a result of this, there is a great need to develop accurate flood prediction 
 flooding ahead of time. However, due to the many factors that are related to predictingflood extent, 
 floods are highly complex to model.  Machine learning techniques have shown promise in this space but
 the current state-of-the-art techniques fail to generaliseto other flood events.  
-This study shows that Long Short-Term Memory (LSTM) net-works are effective at predicting flood extent 
-by surpassing the current state-of-the-artand generalising to other types of flood events.
+This study shows that a novel deep learning technique, namely the Multi-Input ConvLSTM, is effective at predicting the level of flood extent and generalising to other types of flood events.
 
 
 **Example**
