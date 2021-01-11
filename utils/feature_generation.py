@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jun 25 16:02:55 2020
-
-@author: leo
-"""
-
 
 import pandas as pd
 import numpy as np
@@ -20,7 +14,21 @@ from gee_images import GeeImages
 
 
 def make_grid(xmin, ymin, xmax, ymax):
+    """ 
+    Function for creating a grid using polygon objects. 
     
+    Parameters
+    ----------
+    xmin : float, geo-coordinate
+    ymin : float, geo-coordinate
+    xmax : float, geo-coordinate
+    ymax : float, geo-coordinate
+    
+    Returns
+    -------
+    grid : GeoDataFrame
+    
+    """
     length = 0.01
     wide = 0.01
 
@@ -32,16 +40,43 @@ def make_grid(xmin, ymin, xmax, ymax):
     for x in cols:
         for y in rows:
             polygons.append( Polygon([(x,y), (x+wide, y), (x+wide, y-length), (x, y-length)]) )
-            
-    return gpd.GeoDataFrame({'geometry':polygons})
+    
+    grid = gpd.GeoDataFrame({'geometry':polygons})
+    return grid 
 
 
 def plot_grid(flood, grid):
+    """ 
+    Plot grid over flood image. 
+    
+    Parameters
+    ----------
+    flood : GeoDataFrame
+    grid  : GeoDataFrame
+        
+    """
     ax = grid.plot(color='yellow');
     return flood.plot(ax=ax, color='black', alpha=0.5);
 
 
 def flood_frac_df(gdf, grid):
+    """ 
+    Function for calculating the fraction of each square in the grid
+    that contains flooding. Each square conatined in the grid will then
+    return a value in the interval between 0 and 1.
+    
+    Parameters
+    ----------
+    gdf  : GeoDataFrame
+    grid : GeoDataFrame
+    
+    Returns
+    -------
+    df   : DataFrame
+           The resuling DataFrame will contain the fraction of flooding,
+           for each of the original coordinates.
+    
+    """
     flood = gpd.sjoin(grid, gdf, how='left')
     total_list = []
     for grd in grid.geometry:
@@ -55,6 +90,7 @@ def flood_frac_df(gdf, grid):
     df = pd.DataFrame(data={'target':total_list})
     df['centroid'] = grid.centroid
     df['geometry'] = grid.geometry
+    
     return df
 
 
