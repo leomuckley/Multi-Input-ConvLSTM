@@ -3,7 +3,7 @@ TensorFlow implementation of a Multi-Input ConvLSTM, as presented at the *Machin
 
 
 
-[![MIT](https://img.shields.io/github/license/leomuckley/malawi-flood-prediction?logo=MIT)](https://img.shields.io/github/license/leomuckley/malawi-flood-prediction?logo=MIT)
+[![MIT](https://img.shields.io/github/license/leomuckley/malawi-flood-prediction?logo=MIT)](/LICENSE)
 
 
 
