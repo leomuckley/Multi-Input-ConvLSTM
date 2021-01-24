@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jul 30 22:28:27 2020
-
-@author: leo
-"""
-
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
