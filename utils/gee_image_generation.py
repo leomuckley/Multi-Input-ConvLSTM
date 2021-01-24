@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Sat May 23 09:25:31 2020
-
-@author: leo
-"""
-
 
 import ee
 from datetime import datetime as dt
