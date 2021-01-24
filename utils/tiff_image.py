@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Jul 19 10:11:42 2020
-
-@author: leo
-"""
-
 
 import os
 import rasterio as rio
