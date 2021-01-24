@@ -15,8 +15,9 @@ floods are highly complex to model.  Machine learning techniques have shown prom
 the current state-of-the-art techniques fail to generaliseto other flood events.  
 This study shows that a novel deep learning technique, namely the Multi-Input ConvLSTM, is effective at predicting the level of flood extent and generalising to other types of flood events.
 
+Link to full [paper](https://www.leomuckley.com/pdf/Flood_Extent_Prediction.pdf).
 
-**Example**
+**Example** as seen in *experiment.py*
 
 ``` python
 
