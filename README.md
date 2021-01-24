@@ -1,6 +1,8 @@
 # Multi-Input ConvLSTM for Flood Extent Prediction
 TensorFlow implementation of a Multi-Input ConvLSTM, as presented at the *Machine Learning Advances Envrionmental Sciences* workshop at ICPR 2020.
 
+https://img.shields.io/github/license/leomuckley/malawi-flood-prediction?logo=MIT
+
 
 ### Abstract:
 Flooding is among the most destructive natural disasters in the world.  
