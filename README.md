@@ -8,16 +8,11 @@ TensorFlow implementation of a Multi-Input ConvLSTM, as presented at the *Machin
 
 
 ### Abstract:
-Flooding is among the most destructive natural disasters in the world.  
-As a result of this, there is a great need to develop accurate flood prediction models to prevent 
-flooding ahead of time. However, due to the many factors that are related to predictingflood extent, 
-floods are highly complex to model.  Machine learning techniques have shown promise in this space but
-the current state-of-the-art techniques fail to generaliseto other flood events.  
-This study shows that a novel deep learning technique, namely the Multi-Input ConvLSTM, is effective at predicting the level of flood extent and generalising to other types of flood events.
+Flooding is among the most destructive natural disasters in the world. As a result of this, there is a great need to develop accurate flood prediction models to prevent flooding ahead of time. However, due to the many factors that are related to predicting flood extent, floods are highly complex to model. Machine learning techniques have shown promise in this space but the current state-of-the-art techniques fail to generalise to other flood events. This study shows that a novel deep learning technique, namely the Multi-Input ConvLSTM, is effective at predicting the level of flood extent and generalising to other types of flood events.
 
 Link to full [paper](https://link.springer.com/chapter/10.1007/978-3-030-68780-9_8).
 
-**Example** as seen in *experiment.py*
+**Example** (see *experiment.py*)
 
 ``` python
 
