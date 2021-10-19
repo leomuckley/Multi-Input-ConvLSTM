@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import tensorflow as tf
 from tensorflow.keras.layers import LSTM, RepeatVector, Dense, Flatten, ConvLSTM2D, TimeDistributed
