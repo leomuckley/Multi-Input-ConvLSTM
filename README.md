@@ -1,5 +1,6 @@
 # Multi-Input ConvLSTM for Flood Extent Prediction
 TensorFlow implementation of a Multi-Input ConvLSTM, as presented at the *Machine Learning Advances Envrionmental Sciences* workshop at ICPR 2020.
+Repo previously titled _malawi-flood-prediction_
 
 
 
